@@ -6,12 +6,14 @@ import { IDealComponents } from "../../../common/checkoutComponents/iDealCompone
 import { OneyComponents } from "../../../common/checkoutComponents/OneyComponents.js";
 import { GiftcardComponentsMagento } from "../checkout/GiftcardComponentsMagento.js";
 import { AmazonPayComponents } from "../../../common/checkoutComponents/AmazonPayComponents.js";
+import { expect } from "@playwright/test";
 
 export class PaymentDetailsPage {
   constructor(page) {
     this.page = page;
 
     this.emailField = page.locator("#customer-email");
+    this.errorMessage = page.locator(".message-error");
 
     this.creditCardRadioButton = page.locator("#adyen_cc");
     this.idealWrapper = page.locator("#adyen-ideal-form");
@@ -151,5 +153,12 @@ export class PaymentDetailsPage {
   async waitForPaymentMethodReady() {
     await this.page.waitForLoadState("domcontentloaded", { timeout: 15000 });
     await this.activePaymentMethod.scrollIntoViewIfNeeded();
+  }
+
+  async verifyPaymentRefusal() {
+    await this.page.waitForLoadState("domcontentloaded", { timeout: 15000 });
+    expect(await this.errorMessage.innerText()).toContain(
+        "The payment is REFUSED."
+    );
   }
 }

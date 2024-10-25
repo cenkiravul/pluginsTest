@@ -6,7 +6,7 @@ import {
 } from "../helpers/ScenarioHelper.js";
 import { proceedToPaymentAs } from "../helpers/ScenarioHelper.js";
 import { PaymentDetailsPage } from "../pageObjects/plugin/PaymentDetails.page.js";
-import { PayPalPaymentPage } from "../../common/redirect/PayPalPaymentPage.js";
+import { PayPalComponentsMagentoPage } from "../pageObjects/checkout/PayPalComponentsMagento.page.js";
 
 const paymentResources = new PaymentResources();
 const users = paymentResources.guestUser;
@@ -14,13 +14,11 @@ const users = paymentResources.guestUser;
 test.describe("Payment via PayPal", () => {
   test.beforeEach(async ({ page }) => {
     await goToShippingWithFullCart(page);
+    await proceedToPaymentAs(page, users.dutch);
   });
 
   test("should succeed", async ({ page }) => {
-    await proceedToPaymentAs(page, users.dutch);
-
-    await payViaPayPal(
-      page,
+    await new PayPalComponentsMagentoPage(page).payViaPayPal(
       paymentResources.payPalUserName,
       paymentResources.payPalPassword
     );
@@ -28,17 +26,10 @@ test.describe("Payment via PayPal", () => {
     await verifySuccessfulPayment(page);
   });
 
-  async function payViaPayPal(page, username, password) {
+  test("should fail if shopper cancels", async ({ page }) => {
+    await new PayPalComponentsMagentoPage(page).cancelPayPal(page);
+
     const paymentDetailPage = new PaymentDetailsPage(page);
-    const payPalSection = await paymentDetailPage.selectPayPal();
-
-    await page.waitForLoadState("load", { timeout: 15000 });
-
-    const [popup] = await Promise.all([
-      page.waitForEvent("popup"),
-      payPalSection.proceedToPayPal(),
-    ]);
-
-    await new PayPalPaymentPage(popup).makePayPalPayment(username, password);
-  }
+    await paymentDetailPage.verifyPaymentRefusal();
+  });
 });
