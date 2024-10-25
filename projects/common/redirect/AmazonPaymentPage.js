@@ -5,6 +5,8 @@ export class AmazonPayPaymentPage {
     this.emailInput = this.page.locator("#ap_email");
     this.passwordInput = this.page.locator("#ap_password");
     this.loginButton = this.page.locator("#signInSubmit");
+    this.payNowButton = this.page.locator('#continue-button');
+
     this.changePaymentButton = this.page.locator("#change-payment-button");
     this.confirmPaymentChangeButton = this.page.locator("#a-autoid-8");
     this.amazonCaptcha = this.page.locator('//img[contains(@alt,"captcha")]')
@@ -18,10 +20,8 @@ export class AmazonPayPaymentPage {
     await this.passwordInput.click();
     await this.passwordInput.type(password);
     await this.loginButton.click();
-    await this.page.waitForLoadState("load", { timeout: 15000 });
+    await this.page.waitForLoadState();
 
-    if (await this.amazonCaptcha.isVisible()){
-      return false;
-    }
+    await this.payNowButton.click();
   }
 }

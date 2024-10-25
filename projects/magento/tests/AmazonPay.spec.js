@@ -17,7 +17,7 @@ test.describe("Payment via AmazonPay", () => {
     await goToShippingWithFullCart(page);
   });
 
-  test.skip("should successfully redirect to service", async ({ page }) => {
+  test("should succeed", async ({ page }) => {
     await proceedToPaymentAs(page, users.dutch);
 
     await payViaAmazon(
@@ -25,6 +25,8 @@ test.describe("Payment via AmazonPay", () => {
       amazonCredentials.username,
       amazonCredentials.password
     );
+
+    await verifySuccessfulPayment(page);
   });
 
   async function payViaAmazon(page, username, password) {
