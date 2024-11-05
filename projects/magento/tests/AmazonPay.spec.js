@@ -27,7 +27,7 @@ async function amazonPayTestPreparation(page) {
 }
 
 test.describe("Payment via AmazonPay", () => {
-  test.skip(process.env.CI, 'Skipped in CI due to human verification requirements.');
+  test.skip(!!process.env.CI, 'Skipped in CI due to human verification requirements.');
 
   test.beforeEach(async ({ page }) => {
     await amazonPayTestPreparation(page);
