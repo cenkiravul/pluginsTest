@@ -6,7 +6,8 @@ import { GooglePayPage } from "../../../common/redirect/GooglePayPage.js";
 
 const googleCredentials = new PaymentResources().googleCredentials;
 
-test.describe("Payment via Express Checkout with Google Pay", () => { 
+test.describe("Payment via Express Checkout with Google Pay", () => {
+  test.skip(!!process.env.CI, 'Skipped in CI due to human verification requirements.');
 
   test("should work as expected from mini cart", async ({ page }) => {
     await goToShippingWithFullCart(page);
@@ -44,3 +45,25 @@ test.describe("Payment via Express Checkout with Google Pay", () => {
     await verifySuccessfulPayment(page, true, 20000);
   });
 });
+
+test.describe("Smoke test: Google Pay component", () => {
+  /*
+   * This is the smoke asserting Google Pay component is mounted and payment pop-up is loaded.
+   *
+   * Other test cases are skipped on GitHub Actions due to human verification requirements.
+   */
+  test("should be mounted and pop-up needs to be loaded", async ({ page }) => {
+    const productPage = new ProductDetailsPage(page);
+    await productPage.navigateToItemPage("joust-duffle-bag.html");
+
+    await page.waitForLoadState();
+
+    const [popup] = await Promise.all([
+      page.waitForEvent("popup"),
+      await productPage.clickBuyWithGPay()
+    ]);
+
+    const activePopup = new GooglePayPage(popup);
+    await activePopup.assertNavigation();
+  });
+})
