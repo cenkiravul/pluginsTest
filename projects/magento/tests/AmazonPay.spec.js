@@ -33,13 +33,13 @@ test.describe("Payment via AmazonPay", () => {
     await amazonPayTestPreparation(page);
   });
 
-  test("should succeed with default card payment", async ({ page }) => {
+  test("should succeed with default card payment @wallet", async ({ page }) => {
     await new AmazonPayPaymentPage(page).completePayment();
 
     await verifySuccessfulPayment(page);
   });
 
-  test("should succeed with 3DS2 card payment", async ({ page }) => {
+  test("should succeed with 3DS2 card payment @wallet", async ({ page }) => {
     await new AmazonPayPaymentPage(page).selectPaymentMethod('3ds2');
     await new AmazonPayPaymentPage(page).completePayment();
 
@@ -52,7 +52,7 @@ test.describe("Payment via AmazonPay", () => {
     await verifySuccessfulPayment(page);
   });
 
-  test("should allow selecting payment method after refusal", async ({ page }) => {
+  test("should allow selecting payment method after refusal @wallet", async ({ page }) => {
     await new AmazonPayPaymentPage(page).selectPaymentMethod('declined');
     await new AmazonPayPaymentPage(page).completePayment();
     await page.waitForLoadState();
@@ -68,7 +68,7 @@ test.describe("Payment via AmazonPay", () => {
     await verifySuccessfulPayment(page);
   });
 
-  test("should redirect to cart page after cancellation", async ({ page }) => {
+  test("should redirect to cart page after cancellation @wallet", async ({ page }) => {
     await new AmazonPayPaymentPage(page).cancelTransaction();
     await page.waitForURL("**/checkout/cart?**");
   });
