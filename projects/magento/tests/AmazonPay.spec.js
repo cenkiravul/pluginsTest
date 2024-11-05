@@ -1,7 +1,7 @@
 import { test } from "@playwright/test";
 import PaymentResources from "../../data/PaymentResources.js";
 import {
-  goToShippingWithFullCart, verifyFailedPayment,
+  goToShippingWithFullCart,
   verifySuccessfulPayment,
 } from "../helpers/ScenarioHelper.js";
 import { proceedToPaymentAs } from "../helpers/ScenarioHelper.js";
@@ -13,18 +13,24 @@ const paymentResources = new PaymentResources();
 const users = paymentResources.guestUser;
 const amazonCredentials = paymentResources.amazonCredentials;
 
+async function amazonPayTestPreparation(page) {
+  await goToShippingWithFullCart(page);
+  await proceedToPaymentAs(page, users.dutch);
+
+  const paymentDetailPage = new PaymentDetailsPage(page);
+  const amazonPaySection = await paymentDetailPage.selectAmazonPay();
+
+  await amazonPaySection.clickAmazonPayButton();
+  await page.waitForLoadState();
+
+  await new AmazonPayPaymentPage(page).doLogin(amazonCredentials);
+}
+
 test.describe("Payment via AmazonPay", () => {
+  test.skip(process.env.CI, 'Skipped in CI due to human verification requirements.');
+
   test.beforeEach(async ({ page }) => {
-    await goToShippingWithFullCart(page);
-    await proceedToPaymentAs(page, users.dutch);
-
-    const paymentDetailPage = new PaymentDetailsPage(page);
-    const amazonPaySection = await paymentDetailPage.selectAmazonPay();
-
-    await amazonPaySection.clickAmazonPayButton();
-    await page.waitForLoadState();
-
-    await new AmazonPayPaymentPage(page).doLogin(amazonCredentials);
+    await amazonPayTestPreparation(page);
   });
 
   test("should succeed with default card payment", async ({ page }) => {
@@ -67,3 +73,17 @@ test.describe("Payment via AmazonPay", () => {
     await page.waitForURL("**/checkout/cart?**");
   });
 });
+
+test.describe("Smoke test: Amazon Pay component", () => {
+  /*
+   * This is the smoke asserting Amazon Pay component is mounted and
+   * the shopper is redirected to Amazon Pay hosted payment page.
+   *
+   * Other test cases are skipped on GitHub Actions due to human verification requirements.
+   */
+  test("should be mounted and redirect the shopper", async ({ page }) => {
+    await amazonPayTestPreparation(page);
+
+    await new AmazonPayPaymentPage(page).isCaptchaMounted()
+  });
+})
