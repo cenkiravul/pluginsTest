@@ -49,4 +49,8 @@ export class AmazonPayPaymentPage {
   async cancelTransaction() {
     await this.cancelPayment.click();
   }
+
+  async isCaptchaMounted() {
+    return !!(await this.amazonCaptcha.isVisible({timeout: 5000}));
+  }
 }
