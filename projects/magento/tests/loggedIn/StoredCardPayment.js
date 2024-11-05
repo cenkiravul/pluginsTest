@@ -14,6 +14,7 @@ import { ThreeDS2PaymentPage } from "../../../common/redirect/ThreeDS2PaymentPag
 const paymentResources = new PaymentResources();
 const magentoSampleUser = paymentResources.sampleRegisteredUser;
 const users = paymentResources.guestUser;
+const ibanDetails = paymentResources.sepaDirectDebit.nl;
 
 /* No parallelism due to usage of same user account
 since it will cause the cart to reset */
@@ -43,7 +44,7 @@ test.describe("Payment via stored credit card", () => {
     await goToShippingWithFullCart(page);
     await proceedToPaymentAs(page, undefined, false);
 
-    await makeVaultPayment(page, paymentResources.masterCard3DS2, paymentResources.cvc);
+    await makeCCVaultPayment(page, paymentResources.masterCard3DS2, paymentResources.cvc);
     await new ThreeDS2PaymentPage(page).validate3DS2(
       paymentResources.threeDSCorrectPassword
     );
@@ -80,10 +81,26 @@ test.describe("Payment via stored credit card", () => {
     await goToShippingWithFullCart(page);
     await proceedToPaymentAs(page, undefined, false);
 
-    await makeVaultPayment(page, paymentResources.masterCardWithout3D, paymentResources.cvc);
+    await makeCCVaultPayment(page, paymentResources.masterCardWithout3D, paymentResources.cvc);
     await verifySuccessfulPayment(page);
   });
   
+});
+
+test.describe('Payment via stored SEPA token', () => {
+  test.beforeEach(async ({ page }) => {
+    await loginAs(page, magentoSampleUser);
+  });
+
+  test('should succeed', async ({ page }) => {
+    await goToShippingWithFullCart(page);
+    await proceedToPaymentAs(page, undefined, false);
+    await makeSepaDirectDebitPayment(page, ibanDetails);
+
+    await goToShippingWithFullCart(page);
+    await proceedToPaymentAs(page, undefined, false);
+    await makeSepaDirectDebitVaultPayment(page);
+  });
 });
 
 async function makeCreditCardPayment(
@@ -112,9 +129,29 @@ async function makeCreditCardPayment(
   await placeOrder(page);
 }
 
-async function makeVaultPayment(page, creditCardNumber, cvc) {
-  await new PaymentDetailsPage(page).selectVault(creditCardNumber.slice(-4));
+async function makeCCVaultPayment(page, creditCardNumber, cvc) {
+  await new PaymentDetailsPage(page).selectVaultCC(creditCardNumber.slice(-4));
   await new CreditCardComponentsMagento(page.locator(".payment-method._active")).fillCVC(cvc);
 
   await placeOrder(page);
+}
+
+async function makeSepaDirectDebitPayment(page, ibanDetails) {
+  const paymentDetailsPage = new PaymentDetailsPage(page);
+  const sepaPaymentSection = await paymentDetailsPage.selectSepaDirectDebit();
+  await sepaPaymentSection.fillSepaDirectDebitInfo(
+      ibanDetails.accountName,
+      ibanDetails.iban
+  );
+  await placeOrder(page);
+
+  await verifySuccessfulPayment(page);
+}
+
+async function makeSepaDirectDebitVaultPayment(page) {
+  await new PaymentDetailsPage(page).selectVaultSepaDirectDebit();
+
+  await placeOrder(page);
+
+  await verifySuccessfulPayment(page);
 }

@@ -6,12 +6,14 @@ import { IDealComponents } from "../../../common/checkoutComponents/iDealCompone
 import { OneyComponents } from "../../../common/checkoutComponents/OneyComponents.js";
 import { GiftcardComponentsMagento } from "../checkout/GiftcardComponentsMagento.js";
 import { AmazonPayComponents } from "../../../common/checkoutComponents/AmazonPayComponents.js";
+import { expect } from "@playwright/test";
 
 export class PaymentDetailsPage {
   constructor(page) {
     this.page = page;
 
     this.emailField = page.locator("#customer-email");
+    this.errorMessage = page.locator(".message-error");
 
     this.creditCardRadioButton = page.locator("#adyen_cc");
     this.idealWrapper = page.locator("#adyen-ideal-form");
@@ -49,11 +51,18 @@ export class PaymentDetailsPage {
     await this.paymentMethodSaveCheckBox.click();
   }
 
-  async selectVault(lastFourDigits) {
+  async selectVaultCC(lastFourDigits) {
     // Not ideal way of selecting saved card due to vault UI structure
     lastFourDigits != undefined ?
     await this.page.locator(`text=Ending ${lastFourDigits} ( expires: 3/2030 )`).click()
     : await page.locator("input#adyen_cc_vault_1").first().click();
+    await this.waitForPaymentMethodReady();
+  }
+
+  async selectVaultSepaDirectDebit() {
+    const d = new Date();
+    const formattedDate = d.toISOString().split('T')[0];
+    await this.page.locator(`text=SEPA Direct Debit token created on ${formattedDate}`).first().click();
     await this.waitForPaymentMethodReady();
   }
 
@@ -144,5 +153,12 @@ export class PaymentDetailsPage {
   async waitForPaymentMethodReady() {
     await this.page.waitForLoadState("domcontentloaded", { timeout: 15000 });
     await this.activePaymentMethod.scrollIntoViewIfNeeded();
+  }
+
+  async verifyPaymentRefusal() {
+    await this.page.waitForLoadState("domcontentloaded", { timeout: 15000 });
+    expect(await this.errorMessage.innerText()).toContain(
+        "The payment is REFUSED."
+    );
   }
 }

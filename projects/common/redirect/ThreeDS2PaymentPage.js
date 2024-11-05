@@ -18,14 +18,14 @@ export class ThreeDS2PaymentPage {
   }
 
   async fillThreeDS2PasswordAndSubmit(answer) {
-    await this.threeDS2PasswordInput.waitFor({ state: "visible", timeout: 10000 });
+    await this.threeDS2PasswordInput.waitFor({ state: "visible" });
     await this.threeDS2PasswordInput.click();
     await this.threeDS2PasswordInput.type(answer);
     await this.threeDS2SubmitButton.click();
   }
 
   async clickCancel() {
-    await this.threeDS2CancelButton.waitFor({ state: "visible", timeout: 10000 });
+    await this.threeDS2CancelButton.waitFor({ state: "visible" });
     await this.threeDS2CancelButton.click();
   }
 
