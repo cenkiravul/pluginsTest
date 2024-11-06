@@ -30,7 +30,6 @@ export class BasePage extends TopBar {
     });
     await this.cartIcon.click();
 
-    await (this.buyWithGoogleViaCartButtonAnimation).waitFor({state: "visible"});
     await (this.buyWithGoogleViaCartButton).waitFor({state: "visible"});
     await this.page.waitForLoadState();
     await this.buyWithGoogleViaCartButton.click();
