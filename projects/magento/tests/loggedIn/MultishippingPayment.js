@@ -83,7 +83,7 @@ test.describe("Payment with multiple shipping address", () => {
         await verifyRefusedPaymentWithAction(page);
     });
 
-    test.skip("should succeed with iDeal", async ({ page }) => {
+    test("should succeed with iDeal", async ({ page }) => {
         await fillIdeal2Form(page);
 
         await proceedToOrderReviewPageAndPlaceOrder(page);
@@ -92,7 +92,7 @@ test.describe("Payment with multiple shipping address", () => {
         await verifyPayment(page);
     });
 
-    test.skip("should fail with iDeal failing issuer", async ({ page }) => {
+    test("should fail with iDeal failing issuer", async ({ page }) => {
         await fillIdeal2Form(page);
 
         await proceedToOrderReviewPageAndPlaceOrder(page);

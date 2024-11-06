@@ -12,11 +12,6 @@ export class GooglePayPage {
   
       this.paymentIframe = page.frameLocator("iframe[allow='camera']")
       this.payButton = this.paymentIframe.locator(".jfk-button").first();
-  
-      this.progressAnimation = page.locator("//div[@id='initialView'][@aria-busy='true']");
-  
-      // Ugly Xpath locator to work both with Dutch and English text
-      this.verificationText = page.locator("//h1[@id='headingText']/*[contains(text(),'Verif')]");
     }
   
     async assertNavigation(){
@@ -62,7 +57,7 @@ export class GooglePayPage {
     }
   
     async fillGoogleCredentials(username, password){
-      await this.page.waitForLoadState("networkidle", { timeout: 10000 });
+      await this.page.waitForLoadState();
   
       await this.fillUsername(username);
       await this.clickNext();
@@ -71,23 +66,7 @@ export class GooglePayPage {
       await this.clickNext();
     }
   
-    async payOrSkipDueToVerification(){
-      await this.progressAnimation.waitFor({
-        state: "visible",
-        timeout: 5000,
-      });
-      await this.progressAnimation.waitFor({
-        state: "hidden",
-        timeout: 10000,
-      });
-      await this.page.waitForLoadState("networkidle", { timeout: 10000 });
-      
-      if(await this.verificationText.isVisible()){
-        return false;
-      }
-      else {
-        await this.clickPay();
-      }
+    async pay(){
+      await this.clickPay();
     }
-    
   }

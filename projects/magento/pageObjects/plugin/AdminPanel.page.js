@@ -82,7 +82,7 @@ export class AdminPanelPage {
   }
 
   async waitForPageLoad(page) {
-    await page.waitForLoadState("load", { timeout: 10000 });
+    await page.waitForLoadState();
   }
 
   async goToOrdersPage() {

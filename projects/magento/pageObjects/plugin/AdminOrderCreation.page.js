@@ -1,5 +1,7 @@
 import { CreditCardComponentsMagento } from "../checkout/CreditCardComponentsMagento.js";
 import { AdminPanelPage } from "./AdminPanel.page.js";
+import { expect } from "@playwright/test";
+
 export class AdminOrderCreationPage extends AdminPanelPage {
   constructor(page) {
     super(page);
@@ -31,24 +33,31 @@ export class AdminOrderCreationPage extends AdminPanelPage {
   }
 
   async createOrder(page) {
-    await this.page.waitForLoadState("networkidle", { timeout: 10000 });
+    await this.page.waitForLoadState();
     await this.goToOrdersPage();
     await this.waitForPageLoad(page);
+
     await this.createNewOrderButton.click();
     await this.waitForPageLoad(page);
+
     await this.testUserNameSelector.click();
-    
-    await this.page.waitForLoadState("networkidle", { timeout: 10000 });
+    await expect(page.getByText("Customer's Activities")).toBeVisible();
+    await this.page.waitForLoadState();
+
     await this.addProductsButton.click();
     await this.waitForPageLoad(page);
+
     await this.erikaRunningShorts.click();
     await this.waitForPageLoad(page);
+
     await this.addProductsToOrderButton.click();
     await this.waitForLoaderWithText(page);
     await this.waitForPageLoad(page);
+
     await this.shippingMethodCalculateLink.click();
     await this.waitForAdminPanelAnimation(page);
     await this.waitForPageLoad(page);
+
     await this.shippingMethodSelector.click();
     await this.waitForAdminPanelAnimation(page);
     await this.waitForPageLoad(page);

@@ -23,7 +23,7 @@ export class IdealIssuerPage {
 
   async proceedWithSelectedBank(bankName) {
     await this.selectYourBankButton.click();
-    await this.selectIssuerButton.click();
+    await this.selectIssuerButton.first().click();
   }
 
   async simulateSuccess() {

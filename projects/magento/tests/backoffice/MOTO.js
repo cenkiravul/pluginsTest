@@ -23,10 +23,11 @@ test.describe.serial("MOTO Orders", () => {
 
     adyenConfigPage = new AdminAdyenConfigPage(page);
     await adyenConfigPage.closePopup();
-    await adyenConfigPage.goToAdyenPluginConfigurationPage(page);
   });
 
   test("should successfully be created and paid with a valid CC", async ({ page }) => {
+    await adyenConfigPage.goToAdyenPluginConfigurationPage(page);
+
     adyenConfigPage = new AdminAdyenConfigPage(page);
     await adyenConfigPage.enableMOTO(page, apiCredentials.merchantAccount, apiCredentials.clientKey, apiCredentials.apiKey);
 

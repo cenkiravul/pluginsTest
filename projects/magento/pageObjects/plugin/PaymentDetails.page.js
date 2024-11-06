@@ -136,7 +136,7 @@ export class PaymentDetailsPage {
   }
 
   async selectBancontactMobile() {
-    await this.bancontactRadioButton.click();
+    await this.bancontactRadioButton.click({timeout: 30000});
     await this.waitForPaymentMethodReady();
   }
 

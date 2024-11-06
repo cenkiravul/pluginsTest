@@ -25,7 +25,13 @@ export class ProductDetailsPage extends BasePage {
 
   async addToCart(){
     await this.addToCartButton.click();
-    await new AnimationHelper(this.page).waitForAnimation();
+    await this.page.waitForResponse(
+        async (response) => await this.isAddToCartCallFinished(response)
+    );
+  }
+
+  async isAddToCartCallFinished(response) {
+    return response.url().includes('checkout/cart/add') && response.status() === 200;
   }
 
   async addItemToCart(itemURL) {
@@ -39,17 +45,13 @@ export class ProductDetailsPage extends BasePage {
     await this.firstColorOption.click();
     await this.quantityField.fill(howMany.toString());
 
-    await this.addToCartButton.click();
-    await new AnimationHelper(this.page).waitForAnimation();
-    /* 100ms additional ugly wait to prevent race condition between
-    the animation and the item number update */
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await this.addToCart();
+
   }
 
   async clickBuyWithGPay(){
-    await (this.buyWithGoogleViaProductPageButtonAnimation).waitFor({state: "visible"});
     await (this.buyWithGoogleViaProductPageButton).waitFor({state: "visible"});
-    await this.page.waitForLoadState("networkidle", { timeout: 10000 });
+    await this.page.waitForLoadState();
     await this.buyWithGoogleViaProductPageButton.click();
   }
 }

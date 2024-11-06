@@ -18,7 +18,7 @@ export class ClearPayPaymentPage {
   async continueClearPayPayment() {
     const italianUser =  new PaymentResources().guestUser.clearPay.approved.it
 
-    await this.page.waitForLoadState("load", { timeout: 10000 });
+    await this.page.waitForLoadState();
     
     await this.numberEmailInput.waitFor({
       state: "visible",

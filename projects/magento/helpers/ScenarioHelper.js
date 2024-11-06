@@ -14,16 +14,12 @@ export async function goToShippingWithFullCart(page, additionalItemCount = 0, it
   await productDetailsPage.addItemToCart(itemURL);
 
   if (additionalItemCount >= 1) {
-    await page.waitForLoadState("networkidle", { timeout: 20000 });
-
     await productDetailsPage.addItemWithOptionsToCart(
       "breathe-easy-tank.html",
       "M",
       additionalItemCount
     );
   }
-
-  await page.waitForLoadState("networkidle", { timeout: 20000 });
 }
 
 export async function loginAs(page, user) {
@@ -120,7 +116,7 @@ export async function makeIDeal2Payment(page, bankName, success = true) {
     await idealIssuerPage.simulateFailure();
   }
 
-  await page.waitForLoadState("load", { timeout: 10000 });
+  await page.waitForLoadState();
 }
 
 export async function proceedToPaymentWithoutShipping(page) {

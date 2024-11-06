@@ -33,7 +33,7 @@ test.describe("Payment via PayByLink", () => {
       userSession.locator(".adyen-checkout__payment-method--selected")
     );
     await userSession.click("button:has-text('Cards')");
-    await userSession.waitForLoadState("networkidle", { timeout: 10000 });
+    await userSession.waitForLoadState();
     await creditCardSection.fillCardNumber(
       paymentResources.masterCardWithout3D
     );

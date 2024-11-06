@@ -15,9 +15,9 @@ test.describe.skip("Payment via Bancontact Mobile", () => {
   test.beforeEach(async ({ page }) => {
     await goToShippingWithFullCart(page);
     await proceedToPaymentAs(page, user);
-    await page.waitForLoadState("load", {timeout:10000})
+    await page.waitForLoadState()
     await new PaymentDetailsPage(page).selectBancontactMobile();
-    await page.waitForLoadState("load", {timeout:10000})
+    await page.waitForLoadState()
     await placeOrder(page);
   });
 

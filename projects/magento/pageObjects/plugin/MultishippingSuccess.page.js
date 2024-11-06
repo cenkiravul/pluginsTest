@@ -43,7 +43,7 @@ export class MultishippingSuccess {
 
         await this.paymentCompletedButton.first().waitFor({ state: "visible", timeout: 5000 });
 
-        await this.page.waitForLoadState("load", {timeout: 10000});
+        await this.page.waitForLoadState();
 
         await this.completePaymentButton.first().click();
         await new ThreeDS2PaymentPage(this.page).validate3DS2(threeDSPassword);
@@ -54,19 +54,22 @@ export class MultishippingSuccess {
     async completeIdealAction(page, simulateFailure, issuer) {
         await new Promise(r => setTimeout(r, 500));
 
-        await this.completePaymentButton.first().click();
+        let numberOfOrders = 2;
 
-        const idealIssuerPage = new IdealIssuerPage(page, issuer);
+        for (let i = 0; i < numberOfOrders; i++) {
+            const idealIssuerPage = new IdealIssuerPage(page, issuer);
 
-        await idealIssuerPage.proceedWithSelectedBank();
-
-        if (!simulateFailure) {
-            await idealIssuerPage.simulateSuccess();
-        } else {
-            await idealIssuerPage.simulateFailure();
+            await this.completePaymentButton.first().click();
+            await idealIssuerPage.proceedWithSelectedBank();
+            if (!simulateFailure) {
+                await idealIssuerPage.simulateSuccess();
+            } else {
+                await idealIssuerPage.simulateFailure();
+            }
+            await page.waitForLoadState();
+            await this.page.waitForURL("**/checkout/success/**",{timeout:25000, waitUntil:"load"});
         }
 
-        await page.waitForLoadState("load", { timeout: 10000 });
-        await this.page.waitForURL("**/checkout/success/**",{timeout:25000, waitUntil:"load"});
+        await this.completePaymentButton.last().waitFor({ state: "hidden", timeout: 5000 });
     }
 }

@@ -10,7 +10,7 @@ export async function proceedToMultishippingAs(page, user) {
   const multishippingShippingMethodsPage = new MultishippingShippingMethods(page);
 
   await multishippingShippingDetailsPage.goTo();
-  await page.waitForLoadState("load");
+  await page.waitForLoadState();
   let addressCount = await multishippingShippingDetailsPage.getAddressCount()
 
   if (addressCount < 2) {
@@ -74,7 +74,7 @@ export async function verifyRefusedPayment(page) {
 
 export async function completeFinalAction(page, actionType, simulateFailure = false, issuer = null) {
   const multishippingSuccessPage = new MultishippingSuccess(page);
-  await page.waitForLoadState("load", {timeout: 10000});
+  await page.waitForLoadState();
 
   switch (actionType) {
     case "3ds":
