@@ -10,7 +10,7 @@ export class PayPalComponentsMagentoPage extends PayPalComponents {
 
     async payViaPayPal(username, password) {
         const popup = await this.initiatePayPalPopup()
-        await new PayPalPaymentPage(popup).makePayPalPayment(username, password);
+        await new PayPalPaymentPage(popup).doLoginMakePayPalPayment(username, password);
     }
 
     async cancelPayPal() {
