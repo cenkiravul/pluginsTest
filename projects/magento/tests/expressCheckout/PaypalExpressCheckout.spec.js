@@ -8,7 +8,7 @@ import { verifySuccessfulPayment } from "../../helpers/ScenarioHelper.js";
 const paymentResources = new PaymentResources();
 let paypalPopup = null;
 
-test.describe("Payment via Express Checkout with PayPal from mini cart", () => {
+test.describe("Payment via Express Checkout with PayPal from product detail page", () => {
     test.beforeEach(async ({ page }) => {
         const productPage = new ProductDetailsPage(page);
         await productPage.navigateToItemPage();
