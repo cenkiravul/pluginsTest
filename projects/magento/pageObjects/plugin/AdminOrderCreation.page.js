@@ -106,10 +106,13 @@ export class AdminOrderCreationPage extends AdminPanelPage {
   }
 
   async createCapture(page, orderNumber) {
-    await this.performModification(page, orderNumber, this.createInvoice.bind(this));
-  }
+    await this.performModification(page, orderNumber, async () => {
+        await this.createInvoicesIndividually();
+    });
+  } 
 
   async createRefund(page, orderNumber) {
     await this.performModification(page, orderNumber, this.createCreditMemo.bind(this));
   }
+
 }
