@@ -45,5 +45,5 @@ async function payViaPayPal(page, username, password) {
       payPalSection.proceedToPayPal(),
     ]);
 
-    await new PayPalPaymentPage(popup).doLoginMakePayPalPayment(username, password);
+    await new PayPalPaymentPage(popup).makePayPalPayment(username, password);
 }

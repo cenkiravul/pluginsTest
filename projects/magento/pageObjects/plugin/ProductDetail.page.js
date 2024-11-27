@@ -13,18 +13,13 @@ export class ProductDetailsPage extends BasePage {
     this.addToCartButton = page.locator("#product-addtocart-button");
   
     this.productDetailActionsWrapper = page.locator(".box-tocart");
-
     this.buyWithGoogleViaProductPageButton = this.productDetailActionsWrapper
-        .locator(".adyen-checkout__paywithgoogle");
+    .locator(".adyen-checkout__paywithgoogle");
     this.buyWithGoogleViaProductPageButtonAnimation = this.productDetailActionsWrapper
-        .locator(".gpay-card-info-animated-progress-bar");
-
-    this.buyWithPaypalViaProductPageButton = this.productDetailActionsWrapper
-        .frameLocator("iframe[title='PayPal']").last()
-        .locator(".paypal-button");
+    .locator(".gpay-card-info-animated-progress-bar");
   }
 
-  async navigateToItemPage(itemURL = "joust-duffle-bag.html"){
+  async navigateToItemPage(itemURL){
     await this.page.goto(`/${itemURL}`);
   }
 
@@ -58,16 +53,5 @@ export class ProductDetailsPage extends BasePage {
     await (this.buyWithGoogleViaProductPageButton).waitFor({state: "visible"});
     await this.page.waitForLoadState();
     await this.buyWithGoogleViaProductPageButton.click();
-  }
-
-  async clickBuyWithPaypal() {
-    if (!!(await this.buyWithPaypalViaProductPageButton.isVisible())) {
-      await (this.buyWithPaypalViaProductPageButton).waitFor({state: "visible"});
-    }
-
-    await this.page.waitForLoadState();
-
-    await this.buyWithPaypalViaProductPageButton.hover();
-    await this.buyWithPaypalViaProductPageButton.click();
   }
 }
