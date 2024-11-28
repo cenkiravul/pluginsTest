@@ -10,9 +10,9 @@ const randomPspNumber = Math.random().toString().slice(2, 7);
 const username = webhookCredentials.webhookUsername;
 const password = webhookCredentials.webhookPassword;
 
-const base64Credentials = Buffer.from(`${username}:${password}`).toString("base64");
+const base64Credentials = Buffer.from(`${username}:${password}`).toString('base64');
 const headers = {
-    Authorization: `Basic ${base64Credentials}`,
+    Authorization: `Basic ${base64Credentials}`
 };
 
 let adminOrderCreationPage;

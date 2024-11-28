@@ -108,9 +108,9 @@ export class AdminPanelPage {
 
     if(rowCount > 1) {
       const currentRow = itemRows.nth(0);
-      const qtyInput = currentRow.locator('input[name^="invoice[items]"]'); // Matches the quantity input
+      const qtyInput = currentRow.locator('input[name^="invoice[items]"]');
 
-      await qtyInput.fill('0'); // Example of interacting with the quantity input
+      await qtyInput.fill('0');
       await this.page.locator('body').click();
       await this.page.locator('.update-button').evaluate((button) => {
         button.removeAttribute('disabled');
@@ -118,12 +118,8 @@ export class AdminPanelPage {
       });
       const updateQtyButton = this.page.locator('.update-button');
 
-      // Wait until the button is enabled
-      //await expect(updateQtyButton).toBeEnabled({ timeout: 5000 });
-
       // Click the button
       await updateQtyButton.click();
-
     }
     // Submit the invoice
     await this.submitInvoice.click();

@@ -10,18 +10,18 @@ export class AdminOrderCreationPage extends AdminPanelPage {
     // Sales > Orders Section
     this.createNewOrderButton = page.locator("#add");
     this.testUserNameSelector = page.locator(
-        "//td[@data-column='name' and contains(text(),'Veronica Costello')]"
+      "//td[@data-column='name' and contains(text(),'Veronica Costello')]"
     );
     this.addProductsButton = page.locator("#add_products");
 
     this.productDataGrid = page.locator("#sales_order_create_search_grid_table");
     this.erikaRunningShorts = this.productDataGrid.getByRole('cell', { name: 'Erika Running Short-32-Red' });
     this.addProductsToOrderButton = page.locator(
-        "button[title='Add Selected Product(s) to Order']"
+      "button[title='Add Selected Product(s) to Order']"
     );
     this.shippingMethodCalculateLink = page
-        .locator(".order-shipping-method a")
-        .nth(0);
+      .locator(".order-shipping-method a")
+      .nth(0);
     this.shippingMethodSelector = page.locator("#s_method_flatrate_flatrate");
 
     this.payByLinkSelector = page.locator("#p_method_adyen_pay_by_link");
@@ -80,8 +80,8 @@ export class AdminOrderCreationPage extends AdminPanelPage {
     await this.waitForAdminPanelAnimation(page);
 
     merchantAccount != undefined ?
-        await this.motoMerchantAccountDropdown.selectOption({ value: `${merchantAccount}` }) :
-        await this.motoMerchantAccountDropdown.selectOption({ index: 1 });
+      await this.motoMerchantAccountDropdown.selectOption({ value: `${merchantAccount}` }) :
+      await this.motoMerchantAccountDropdown.selectOption({ index: 1 });
 
     // await this.waitForAdminPanelAnimation(page);
     await this.waitForPageLoad(page);
@@ -114,5 +114,4 @@ export class AdminOrderCreationPage extends AdminPanelPage {
   async createRefund(page, orderNumber) {
     await this.performModification(page, orderNumber, this.createCreditMemo.bind(this));
   }
-
 }
