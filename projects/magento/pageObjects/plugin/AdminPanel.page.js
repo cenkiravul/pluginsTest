@@ -96,8 +96,40 @@ export class AdminPanelPage {
   }
 
   async createInvoice() {
-   await this.invoiceActionLink.click();
-   await this.submitInvoice.click();
+    await this.invoiceActionLink.click();
+    await this.submitInvoice.click();
+  }
+
+  async createInvoicesIndividually() {
+    await this.invoiceActionLink.click();
+
+    const itemRows = this.page.locator('.order-invoice-tables > tbody');
+    let rowCount = await itemRows.count();
+
+    if(rowCount > 1) {
+      const currentRow = itemRows.nth(0);
+      const qtyInput = currentRow.locator('input[name^="invoice[items]"]'); // Matches the quantity input
+
+      await qtyInput.fill('0'); // Example of interacting with the quantity input
+      await this.page.locator('body').click();
+      await this.page.locator('.update-button').evaluate((button) => {
+        button.removeAttribute('disabled');
+        button.classList.remove('disabled');
+      });
+      const updateQtyButton = this.page.locator('.update-button');
+
+      // Wait until the button is enabled
+      //await expect(updateQtyButton).toBeEnabled({ timeout: 5000 });
+
+      // Click the button
+      await updateQtyButton.click();
+
+    }
+    // Submit the invoice
+    await this.submitInvoice.click();
+
+    // Wait for the success message (or handle errors)
+    await this.successMessage.waitFor({ state: "visible", timeout: 15000 });
   }
 
   async createCreditMemo(orderNumber) {

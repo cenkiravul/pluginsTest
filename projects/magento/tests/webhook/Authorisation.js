@@ -24,7 +24,7 @@ const headers = {
 
 test.describe("Process AUTHORISATION webhook notifications", () => {
   test.beforeEach(async ({ page }) => {
-    await goToShippingWithFullCart(page);
+    await goToShippingWithFullCart(page,1);
     await proceedToPaymentAs(page, users.dutch);
     await makeCreditCardPayment(
       page,
@@ -49,7 +49,7 @@ test.describe("Process AUTHORISATION webhook notifications", () => {
              "NotificationRequestItem" : {
                    "amount" : {
                    "currency" : "EUR",
-                   "value" : 3900
+                   "value" : 7800
                 },
                 "eventCode" : "AUTHORISATION",
                 "eventDate" : "2023-05-23T15:48:53+02:00",
@@ -78,6 +78,6 @@ test.describe("Process AUTHORISATION webhook notifications", () => {
  
  // Check the body of processed notification
  const processedNotificationBody = await processedNotificationResponse.json();
-  expect(processedNotificationBody[0].status).toBe("pending_payment");
+  expect(processedNotificationBody[0].status).toBe("adyen_authorized");
  });
 });
