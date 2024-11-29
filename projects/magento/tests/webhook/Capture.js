@@ -17,7 +17,7 @@ const headers = {
 
 let adminOrderCreationPage;
 
-async function processCaptureWebhook(request, captureData) {
+async function processCaptureWebhook(request, captureData, paymentStatus, captureOrder) {
     const processWebhookResponse = await request.post("/adyen/webhook", {
         headers,
         data: {
@@ -33,12 +33,13 @@ async function processCaptureWebhook(request, captureData) {
     expect(processWebhookResponse.status()).toBe(200);
 
     const processedNotificationResponse = await request.get(
-        `/adyentest/test?orderId=${SharedState.orderNumber}&eventCode=CAPTURE`
+        `/adyentest/test?orderId=${SharedState.orderNumber}&eventCode=CAPTURE&captureOrder=${captureOrder}`
     );
     expect(processedNotificationResponse.status()).toBe(200);
 
     const processedNotificationBody = await processedNotificationResponse.json();
-    expect(processedNotificationBody[0].status).toBe("adyen_authorized");
+    expect(processedNotificationBody[0].status).toBe(paymentStatus);
+    //Processing status should be received for the final capture
 }
 
 test.describe("Process CAPTURE webhook notifications - Full and Partial Capture", () => {
@@ -54,7 +55,7 @@ test.describe("Process CAPTURE webhook notifications - Full and Partial Capture"
         const captureData = {
             amount: {
                 currency: "EUR",
-                value: 3900,
+                value: 4400,
             },
             eventCode: "CAPTURE",
             eventDate: "2023-09-18T15:51:21+02:00",
@@ -67,30 +68,28 @@ test.describe("Process CAPTURE webhook notifications - Full and Partial Capture"
             success: "true",
         };
 
-        await processCaptureWebhook(request, captureData);
+        await processCaptureWebhook(request, captureData, 'adyen_authorized',0);
     });
 
     test("should process partial CAPTURE webhooks", async ({ request, page }) => {
-        await adminOrderCreationPage.goToOrdersPage();
-        await adminOrderCreationPage.selectOrderToModify(SharedState.orderNumber);
         await adminOrderCreationPage.createCapture(page, SharedState.orderNumber);
 
-        const captureData = {
+        const captureData2 = {
             amount: {
-                currency: "USD",
-                value: 4500,
+                currency: "EUR",
+                value: 3400,
             },
             eventCode: "CAPTURE",
             eventDate: "2023-09-18T15:51:21+02:00",
             merchantAccountCode: `${paymentResources.apiCredentials.merchantAccount}`,
             merchantReference: `${SharedState.orderNumber}`,
             originalReference: "DGSVMDS3N3RZNN82",
-            paymentMethod: "mastercard",
+            paymentMethod: "visa",
             pspReference: `LVL9PX2ZPQR${randomPspNumber}`,
             reason: "",
             success: "true",
         };
 
-        await processCaptureWebhook(request, captureData);
+        await processCaptureWebhook(request, captureData2, 'processing',1);
     });
 });
