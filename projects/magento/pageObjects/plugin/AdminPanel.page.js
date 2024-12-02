@@ -96,8 +96,36 @@ export class AdminPanelPage {
   }
 
   async createInvoice() {
-   await this.invoiceActionLink.click();
-   await this.submitInvoice.click();
+    await this.invoiceActionLink.click();
+    await this.submitInvoice.click();
+  }
+
+  async createInvoicesIndividually() {
+    await this.invoiceActionLink.click();
+
+    const itemRows = this.page.locator('.order-invoice-tables > tbody');
+    let rowCount = await itemRows.count();
+
+    if(rowCount > 1) {
+      const currentRow = itemRows.nth(0);
+      const qtyInput = currentRow.locator('input[name^="invoice[items]"]');
+
+      await qtyInput.fill('0');
+      await this.page.locator('body').click();
+      await this.page.locator('.update-button').evaluate((button) => {
+        button.removeAttribute('disabled');
+        button.classList.remove('disabled');
+      });
+      const updateQtyButton = this.page.locator('.update-button');
+
+      // Click the button
+      await updateQtyButton.click();
+    }
+    // Submit the invoice
+    await this.submitInvoice.click();
+
+    // Wait for the success message (or handle errors)
+    await this.successMessage.waitFor({ state: "visible", timeout: 15000 });
   }
 
   async createCreditMemo(orderNumber) {

@@ -13,7 +13,7 @@ export class AdminOrderCreationPage extends AdminPanelPage {
       "//td[@data-column='name' and contains(text(),'Veronica Costello')]"
     );
     this.addProductsButton = page.locator("#add_products");
-    
+
     this.productDataGrid = page.locator("#sales_order_create_search_grid_table");
     this.erikaRunningShorts = this.productDataGrid.getByRole('cell', { name: 'Erika Running Short-32-Red' });
     this.addProductsToOrderButton = page.locator(
@@ -106,7 +106,9 @@ export class AdminOrderCreationPage extends AdminPanelPage {
   }
 
   async createCapture(page, orderNumber) {
-    await this.performModification(page, orderNumber, this.createInvoice.bind(this));
+    await this.performModification(page, orderNumber, async () => {
+      await this.createInvoicesIndividually();
+    });
   }
 
   async createRefund(page, orderNumber) {
