@@ -18,7 +18,7 @@ const ibanDetails = paymentResources.sepaDirectDebit.nl;
 
 /* No parallelism due to usage of same user account
 since it will cause the cart to reset */
-test.describe("Payment via stored credit card", () => {
+test.describe.serial("Payment via stored credit card", () => {
   
   test.beforeEach(async ({ page }) => {
     await loginAs(page, magentoSampleUser);
@@ -87,7 +87,7 @@ test.describe("Payment via stored credit card", () => {
   
 });
 
-test.describe('Payment via stored SEPA token', () => {
+test.describe.serial('Payment via stored SEPA token', () => {
   test.beforeEach(async ({ page }) => {
     await loginAs(page, magentoSampleUser);
   });

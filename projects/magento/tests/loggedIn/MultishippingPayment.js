@@ -18,7 +18,7 @@ const paymentResources = new PaymentResources();
 const magentoSampleUser = paymentResources.sampleRegisteredUser;
 const users = paymentResources.guestUser;
 
-test.describe("Payment with multiple shipping address", () => {
+test.describe.serial("Payment with multiple shipping address", () => {
     test.beforeEach(async ({page}) => {
         await loginAs(page, magentoSampleUser);
         await goToShippingWithFullCart(page, 1);
