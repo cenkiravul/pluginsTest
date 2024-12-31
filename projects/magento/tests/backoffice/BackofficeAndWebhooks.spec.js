@@ -10,8 +10,8 @@ import "../webhook/Capture.js";
 import "../webhook/Refund.js";
 
 // Backoffice Tests
-// import "./MOTO.js";
-// import "./RequiredSettingsAutoConfig.js"
-// import "./RequiredSettingsManualConfig.js"
-// import "./PayByLink.js"
+import "./MOTO.js";
+import "./RequiredSettingsAutoConfig.js"
+import "./RequiredSettingsManualConfig.js"
+import "./PayByLink.js"
 
