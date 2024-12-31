@@ -14,4 +14,3 @@ import "./MOTO.js";
 import "./RequiredSettingsAutoConfig.js"
 import "./RequiredSettingsManualConfig.js"
 import "./PayByLink.js"
-

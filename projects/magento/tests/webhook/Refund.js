@@ -17,16 +17,27 @@ const headers = {
 };
 
 let adminOrderCreationPage;
+let invoices;
 
 test.describe("Process REFUND webhook notifications", () => {
     test.beforeEach(async ({ page }) => {
         await loginAsAdmin(page, magentoAdminUser)
         adminOrderCreationPage = new AdminOrderCreationPage(page);
         await adminOrderCreationPage.closePopup();
-        await adminOrderCreationPage.createRefund(page, SharedState.orderNumber);
+
+        await adminOrderCreationPage.goToOrderDetailPage(page, SharedState.orderNumber);
+        invoices = await adminOrderCreationPage.getInvoices(page);
     });
 
-    test("should be able to process REFUND webhooks", async ({ request }) => {
+    test("should be able to process first partial REFUND webhook", async ({ request, page }) => {
+        let invoiceToRefund = invoices[0];
+        adminOrderCreationPage = new AdminOrderCreationPage(page);
+
+        await adminOrderCreationPage.createRefund(page, SharedState.orderNumber, invoiceToRefund.invoiceId);
+
+        // Wait until the invoice is created
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
         const processWebhookResponse = await request.post("/adyen/webhook", {
             headers,
             data: {
@@ -36,7 +47,7 @@ test.describe("Process REFUND webhook notifications", () => {
                     "NotificationRequestItem": {
                         "amount": {
                             "currency": "EUR",
-                            "value": 3900
+                            "value": parseInt(invoiceToRefund.amount)
                         },
                         "eventCode": "REFUND",
                         "eventDate": "2023-09-15T15:52:17+02:00",
@@ -52,10 +63,58 @@ test.describe("Process REFUND webhook notifications", () => {
             ]
           }
        });
+
        expect(processWebhookResponse.status()).toBe(200);
-       const processedNotificationResponse = await request.get(`/adyentest/test?orderId=${SharedState.orderNumber}&eventCode=REFUND`);
+
+       const processedNotificationResponse = await request.get(`/adyentest/test?orderId=${SharedState.orderNumber}&eventCode=REFUND&processOrder=0`);
        expect(processedNotificationResponse.status()).toBe(200);
+
        const processedNotificationBody = await processedNotificationResponse.json();
-       expect(parseFloat(processedNotificationBody[0].total_refunded)).toEqual(parseFloat(processedNotificationBody[0].grand_total));
-    })
+       //expect(parseFloat(processedNotificationBody[0].total_refunded)).toEqual(parseFloat(processedNotificationBody[0].grand_total));
+       expect((parseFloat(invoiceToRefund.amount) / 100)).toEqual(parseFloat(processedNotificationBody[0].total_refunded));
+    });
+
+    test("should be able to process second partial REFUND webhook", async ({ request, page }) => {
+        let invoiceToRefund = invoices[1];
+        adminOrderCreationPage = new AdminOrderCreationPage(page);
+
+        await adminOrderCreationPage.createRefund(page, SharedState.orderNumber, invoiceToRefund.invoiceId);
+
+        // Wait until the invoice is created
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
+        const processWebhookResponse = await request.post("/adyen/webhook", {
+            headers,
+            data: {
+                "live" : "false",
+                "notificationItems": [
+                    {
+                        "NotificationRequestItem": {
+                            "amount": {
+                                "currency": "EUR",
+                                "value": parseInt(invoiceToRefund.amount)
+                            },
+                            "eventCode": "REFUND",
+                            "eventDate": "2023-09-15T15:52:17+02:00",
+                            "merchantAccountCode": `${paymentResources.apiCredentials.merchantAccount}`,
+                            "merchantReference": `${SharedState.orderNumber}`,
+                            "originalReference": "DGSVMDS3N3RZNN82",
+                            "paymentMethod": "visa",
+                            "pspReference": `LVL9PX2ZPQR${randomPspNumber}`,
+                            "reason": "",
+                            "success": "true"
+                        }
+                    }
+                ]
+            }
+        });
+
+        expect(processWebhookResponse.status()).toBe(200);
+
+        const processedNotificationResponse = await request.get(`/adyentest/test?orderId=${SharedState.orderNumber}&eventCode=REFUND&processOrder=1`);
+        expect(processedNotificationResponse.status()).toBe(200);
+
+        const processedNotificationBody = await processedNotificationResponse.json();
+        expect(parseFloat(processedNotificationBody[0].total_refunded)).toEqual(parseFloat(processedNotificationBody[0].grand_total));
+    });
 });
