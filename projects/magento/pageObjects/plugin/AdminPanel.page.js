@@ -46,8 +46,19 @@ export class AdminPanelPage {
     this.paymentMethodsLink = this.salesConfigMenu.locator("//span[text()='Payment Methods']");
 
     //Order details page
-    this.creditMemoSidebar = this.page.locator("#sales_order_view_tabs_order_invoices").getByRole('link', { name: 'Invoices' })
-    this.getInvoiceLink = (orderNumber) => {return this.page.locator(".data-grid.data-grid-draggable").getByRole('cell', { name:`${orderNumber}` })};
+    this.invoicesSidebar = this.page.locator("#sales_order_view_tabs_order_invoices").getByRole('link', { name: 'Invoices' })
+    this.invoicesSpinner = this.page.locator(".admin__data-grid-loading-mask").nth(1);
+    this.getInvoiceLink = (orderNumber, invoiceId = null) => {
+      let locator;
+
+      if (invoiceId !== null) {
+        locator = this.page.locator(".data-grid.data-grid-draggable").getByRole('cell', { name:`${invoiceId}` });
+      } else {
+        locator = this.page.locator(".data-grid.data-grid-draggable").getByRole('cell', { name:`${orderNumber}` });
+      }
+
+      return locator;
+    };
     this.invoiceActionLink = this.page.locator(".page-actions-buttons").getByRole('button', { name: 'Invoice' });
     this.submitInvoice = this.page.locator(".order-totals-actions").getByRole('button', { name: 'Submit Invoice' });
     this.creditMemoLink = this.page.locator(".page-actions-buttons").getByRole('button', { name: 'Credit Memo' });
@@ -128,9 +139,9 @@ export class AdminPanelPage {
     await this.successMessage.waitFor({ state: "visible", timeout: 15000 });
   }
 
-  async createCreditMemo(orderNumber) {
-    await this.creditMemoSidebar.click();
-    const invoiceLink = this.getInvoiceLink(orderNumber);
+  async createCreditMemo(orderNumber, invoiceId = null) {
+    await this.invoicesSidebar.click();
+    const invoiceLink = this.getInvoiceLink(orderNumber, invoiceId);
     await invoiceLink.click();
     await this.creditMemoLink.click();
     this.refundButton.click();
@@ -147,5 +158,29 @@ export class AdminPanelPage {
     await this.paymentMethodsLink.scrollIntoViewIfNeeded();
     await this.paymentMethodsLink.click();
     await this.waitForPageLoad(page);
+  }
+
+  async getInvoices(page) {
+    await this.invoicesSidebar.click();
+    await this.waitForPageLoad(page);
+
+    await this.invoicesSpinner.waitFor({ state: "hidden", timeout: 15000 });
+
+    let rows = page.locator(".data-row");
+    let count = await rows.count();
+    let invoices = [];
+
+    for (let i = 0; i < count; i++) {
+      let invoiceId = await rows.nth(i).locator("td").nth(1).innerText();
+      let amount = await rows.nth(i).locator("td").nth(7).innerText();
+      let amountInMinorUnits = amount.replace(/€(\d+)\.(\d+)/, (_, euros, cents) => euros + cents);
+
+      invoices.push({
+        invoiceId: invoiceId,
+        amount: amountInMinorUnits
+      })
+    }
+
+    return invoices;
   }
 }
