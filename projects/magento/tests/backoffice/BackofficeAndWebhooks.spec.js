@@ -9,7 +9,7 @@ import "../webhook/Authorisation.js";
 import "../webhook/Capture.js";
 import "../webhook/Refund.js";
 
-// // Backoffice Tests
+// Backoffice Tests
 import "./MOTO.js";
 import "./RequiredSettingsAutoConfig.js"
 import "./DeleteWebhook.js"
