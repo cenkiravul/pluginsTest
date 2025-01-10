@@ -16,4 +16,3 @@ import "./DeleteWebhook.js"
 import "./RequiredSettingsManualConfig.js"
 import "./PayByLink.js"
 
-
