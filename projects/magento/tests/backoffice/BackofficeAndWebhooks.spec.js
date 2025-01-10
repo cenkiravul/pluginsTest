@@ -12,5 +12,7 @@ import "../webhook/Refund.js";
 // Backoffice Tests
 import "./MOTO.js";
 import "./RequiredSettingsAutoConfig.js"
+import "./DeleteWebhook.js"
 import "./RequiredSettingsManualConfig.js"
 import "./PayByLink.js"
+
